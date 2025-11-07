@@ -28,10 +28,13 @@ public class RandomMovements implements Runnable {
 		while (true) {
 			switch (STATE) {
 			case IDLE:
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				synchronized (this) {
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						Thread.currentThread().interrupt();
+					}
 				}
 				if (working)
 					STATE = StateEnum.GENERATE;
@@ -72,7 +75,6 @@ public class RandomMovements implements Runnable {
 				break;
 
 			case SEND:
-				System.out.println("a");
 				bufferManager.acquire();
 				for (int i = 0; i < this.actionNumber * 2; i++) {
 					robotController.putBuffer(movementList[i]);
@@ -100,6 +102,7 @@ public class RandomMovements implements Runnable {
 
 	public synchronized void setWorking(boolean working) {
 		this.working = working;
+		this.notify();
 	}
 
 	public synchronized void setActionNumber(int actionNumber) {

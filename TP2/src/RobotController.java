@@ -24,10 +24,13 @@ public class RobotController implements Runnable {
 		while (true) {
 			switch (bufferState) {
 			case IDLE:
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				synchronized (this) {
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						Thread.currentThread().interrupt();
+					}
 				}
 				if (!buffer.isEmpty())
 					bufferState = StateEnum.EXECUTE;
@@ -79,28 +82,34 @@ public class RobotController implements Runnable {
 		// robot.CloseEV3();
 	}
 
-	public void bufferMoveForward() {
+	public synchronized void bufferMoveForward() {
 		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, data.getDistance()));
+		notify();
 	}
 
-	public void bufferMoveBackwards() {
+	public synchronized void bufferMoveBackwards() {
 		buffer.put(new Movement(robot, logger, MovementEnum.BACKWARDS, data.getDistance()));
+		notify();
 	}
 
-	public void bufferMoveRightCurve() {
+	public synchronized void bufferMoveRightCurve() {
 		buffer.put(new Movement(robot, logger, MovementEnum.RIGHT, data.getRadius(), data.getAngle()));
+		notify();
 	}
 
-	public void bufferMoveLeftCurve() {
+	public synchronized void bufferMoveLeftCurve() {
 		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, data.getRadius(), data.getAngle()));
+		notify();
 	}
 
-	public void bufferStopMovement() {
+	public synchronized void bufferStopMovement() {
 		buffer.put(new Movement(robot, logger, MovementEnum.STOP));
+		notify();
 	}
 
-	public void putBuffer(Movement movement) {
+	public synchronized void putBuffer(Movement movement) {
 		buffer.put(movement);
+		notify();
 	}
 
 	public void stopMovement() {
