@@ -31,8 +31,10 @@ public class GUI implements ILogger {
 	private JRadioButton rdbtnRandomMovements;
 	private JTextArea textArea;
 
-	private final RobotController robotController = new RobotController();
 	private final Thread robotControllerThread;
+
+	private final BufferManager bufferManager = new BufferManager();
+	private final RobotController robotController;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -53,11 +55,11 @@ public class GUI implements ILogger {
 	}
 
 	public GUI() {
-		initialize();
-		updateData();
-		robotController.setLogger(this);
+		this.robotController = new RobotController(bufferManager, this);
 		this.robotControllerThread = new Thread(robotController);
 		robotControllerThread.start();
+		initialize();
+		updateData();
 	}
 
 	public void updateData() {
@@ -193,7 +195,9 @@ public class GUI implements ILogger {
 		btnFoward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateData();
-				robotController.moveForward();
+				bufferManager.acquire();
+				robotController.bufferMoveForward();
+				bufferManager.release();
 			}
 		});
 		btnFoward.setBounds(246, 106, 156, 36);
@@ -219,7 +223,9 @@ public class GUI implements ILogger {
 		btnLeft.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateData();
-				robotController.moveLeftCurve();
+				bufferManager.acquire();
+				robotController.bufferMoveLeftCurve();
+				bufferManager.release();
 			}
 		});
 		btnLeft.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -234,7 +240,9 @@ public class GUI implements ILogger {
 		btnRight.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateData();
-				robotController.moveRightCurve();
+				bufferManager.acquire();
+				robotController.bufferMoveRightCurve();
+				bufferManager.release();
 			}
 		});
 
@@ -243,7 +251,9 @@ public class GUI implements ILogger {
 		btnBackwards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateData();
-				robotController.moveBackwards();
+				bufferManager.acquire();
+				robotController.bufferMoveBackwards();
+				bufferManager.release();
 			}
 		});
 		btnBackwards.setFont(new Font("Tahoma", Font.PLAIN, 20));

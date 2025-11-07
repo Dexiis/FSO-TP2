@@ -2,7 +2,7 @@ public class RobotController implements Runnable {
 
 	private final Data data = new Data(0, 0, 0, 0, null);
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
-	private final RandomMovements randomMovements = new RandomMovements(this);
+	private final RandomMovements randomMovements;
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
 
@@ -12,9 +12,10 @@ public class RobotController implements Runnable {
 	private StateEnum bufferState = StateEnum.IDLE;
 
 	private long waitingTime;
-	private long timeStamp;
 
-	public RobotController() {
+	public RobotController(BufferManager bufferManager, ILogger logger) {
+		this.logger = logger;
+		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
 		this.randomMovementsThread = new Thread(randomMovements);
 		this.randomMovementsThread.start();
 	}
@@ -23,6 +24,11 @@ public class RobotController implements Runnable {
 		while (true) {
 			switch (bufferState) {
 			case IDLE:
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				if (!buffer.isEmpty())
 					bufferState = StateEnum.EXECUTE;
 				break;
@@ -30,24 +36,25 @@ public class RobotController implements Runnable {
 				movement = buffer.get();
 				movement.doMovement();
 				waitingTime = movement.getTime();
-				timeStamp = System.currentTimeMillis();
 				bufferState = StateEnum.WAIT;
 				break;
 			case WAIT:
-				if (System.currentTimeMillis() - timeStamp >= waitingTime)
-					if (buffer.isEmpty()) {
-						bufferState = StateEnum.IDLE;
-						stopMovementSync();
-					} else {
-						bufferState = StateEnum.EXECUTE;
-					}
+				try {
+					Thread.sleep(waitingTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if (buffer.isEmpty()) {
+					bufferState = StateEnum.IDLE;
+					stopMovementSync();
+				} else {
+					bufferState = StateEnum.EXECUTE;
+				}
+				break;
+			default:
 				break;
 			}
 		}
-	}
-
-	public void setLogger(ILogger logger) {
-		this.logger = logger;
 	}
 
 	private void log(String message) {
@@ -64,12 +71,6 @@ public class RobotController implements Runnable {
 		data.setActionNumber(Integer.parseInt(actionNumber));
 	}
 
-	public void updateData(int radius, int angle, int distance) {
-		data.setRadius(radius);
-		data.setAngle(angle);
-		data.setDistance(distance);
-	}
-
 	public void turnOnRobot() {
 		robot.OpenEV3(data.getName());
 	}
@@ -78,24 +79,28 @@ public class RobotController implements Runnable {
 		// robot.CloseEV3();
 	}
 
-	public void moveForward() {
+	public void bufferMoveForward() {
 		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, data.getDistance()));
 	}
 
-	public void moveBackwards() {
+	public void bufferMoveBackwards() {
 		buffer.put(new Movement(robot, logger, MovementEnum.BACKWARDS, data.getDistance()));
 	}
 
-	public void moveRightCurve() {
+	public void bufferMoveRightCurve() {
 		buffer.put(new Movement(robot, logger, MovementEnum.RIGHT, data.getRadius(), data.getAngle()));
 	}
 
-	public void moveLeftCurve() {
+	public void bufferMoveLeftCurve() {
 		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, data.getRadius(), data.getAngle()));
 	}
 
 	public void bufferStopMovement() {
 		buffer.put(new Movement(robot, logger, MovementEnum.STOP));
+	}
+
+	public void putBuffer(Movement movement) {
+		buffer.put(movement);
 	}
 
 	public void stopMovement() {
@@ -131,13 +136,5 @@ public class RobotController implements Runnable {
 
 	public void clearBuffer() {
 		buffer.clearBuffer();
-	}
-
-	public int getDelayStraightLine() {
-		return data.getDelayStraightLine();
-	}
-
-	public int getDelayCurve() {
-		return data.getDelayCurve();
 	}
 }
