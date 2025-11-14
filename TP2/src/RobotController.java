@@ -3,9 +3,13 @@ public class RobotController implements Runnable {
 	private final Data data = new Data(0, 0, 0, 0, null);
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
 	private final RandomMovements randomMovements;
+	private final AvoidObstacle avoidObstacle;
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
+	private final Thread avoidObstacleThread;
 
+	public boolean robotOn = false;
+	
 	private ILogger logger;
 
 	private Movement movement;
@@ -16,8 +20,11 @@ public class RobotController implements Runnable {
 	public RobotController(BufferManager bufferManager, ILogger logger) {
 		this.logger = logger;
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
+		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager);
 		this.randomMovementsThread = new Thread(randomMovements);
 		this.randomMovementsThread.start();
+		this.avoidObstacleThread = new Thread(avoidObstacle);
+		this.avoidObstacleThread.start();
 	}
 
 	public void run() {
@@ -76,6 +83,7 @@ public class RobotController implements Runnable {
 
 	public void turnOnRobot() {
 		robot.OpenEV3(data.getName());
+		this.robotOn = true;
 	}
 
 	public void turnOffRobot() {
@@ -106,9 +114,18 @@ public class RobotController implements Runnable {
 		buffer.put(new Movement(robot, logger, MovementEnum.STOP));
 		notify();
 	}
+	
+	public synchronized boolean obstacleFound() {
+		return robot.SensorToque(robot.S_1) == 1;
+	}
 
 	public synchronized void putBuffer(Movement movement) {
 		buffer.put(movement);
+		notify();
+	}
+	
+	public synchronized void putBufferHigherPriority(Movement movement) {
+		buffer.higherPriorityPut(movement);
 		notify();
 	}
 
