@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class AvoidObstacle implements Runnable {
 
 	private StateEnum STATE = StateEnum.IDLE;
@@ -8,6 +10,9 @@ public class AvoidObstacle implements Runnable {
 	private BufferManager bufferManager;
 	private ILogger logger;
 	private RobotLegoEV3 robot;
+	private long waitingTime = 0;
+	
+	private Random random = new Random();
 	
 	private Movement[] movementList = new Movement[MOVEMENT_NUMBER];
 	
@@ -30,30 +35,53 @@ public class AvoidObstacle implements Runnable {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					if(robotController.robotOn && robotController.obstacleFound()) {
+					
+					/* MODO ROBO */
+					if(robotController.robotOn && robotController.obstacleFound())
 						STATE = StateEnum.SEND;
-					}
+					
+					/* MODO TESTE 
+					if(robotController.obstacleFound())
+						STATE = StateEnum.GENERATE;
+					*/
+					
 				}
 				break;
 			case GENERATE:
+				waitingTime = 0;
+				
 				movementList[0] = new Movement(this.robot, this.logger, MovementEnum.STOP);
 				movementList[1] = new Movement(this.robot, this.logger, MovementEnum.BACKWARDS, 20);
 				
-				// Fazer random entre curvar direita e curvar esquerda
+				while(true) {
+					MovementEnum[] movement = MovementEnum.values();
+					int direction = random.nextInt(movement.length);
+					
+					if(movement[direction] == MovementEnum.LEFT || movement[direction] == MovementEnum.RIGHT) {
+						movementList[2] = new Movement(this.robot, this.logger, movement[direction], 0, 90);
+						break;
+					}
+				}
 				
-				// PROBLEMA DE EXCLUSAO MUTUA
+				for(Movement movement : movementList)
+					waitingTime += movement.getTime();
+				
+				// PROBLEMA DE EXCLUSAO MUTUA (em teste não voltou a aparecer)
 				
 			case SEND:
 				bufferManager.acquire();
-				for(int i = MOVEMENT_NUMBER - 1; i > 0; i--) {
+				for(int i = MOVEMENT_NUMBER - 1; i >= 0; i--) {
 					robotController.putBufferHigherPriority(movementList[i]);
-				}
+				}	
 				bufferManager.release();
 				STATE = StateEnum.WAIT;
 				break;
 			case WAIT:
-				
-				// Fazer o wait
+				try {
+					Thread.sleep(waitingTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				
 				STATE = StateEnum.IDLE;
 				

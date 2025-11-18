@@ -10,6 +10,9 @@ public class RobotController implements Runnable {
 
 	public boolean robotOn = false;
 	
+	/* TESTE */
+	public boolean sensorTest = false;
+	
 	private ILogger logger;
 
 	private Movement movement;
@@ -116,7 +119,12 @@ public class RobotController implements Runnable {
 	}
 	
 	public synchronized boolean obstacleFound() {
+		/* MODO ROBO */
 		return robot.SensorToque(robot.S_1) == 1;
+		
+		/* MODO TESTE
+		return sensorTest;
+		*/
 	}
 
 	public synchronized void putBuffer(Movement movement) {

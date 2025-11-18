@@ -70,7 +70,9 @@ public class RandomMovements implements Runnable {
 
 					lastDirection = movement[direction];
 				}
-
+				
+				System.out.println(movementList);
+				
 				STATE = StateEnum.SEND;
 				break;
 

@@ -268,5 +268,16 @@ public class GUI implements ILogger {
 		});
 		btnNewButton.setBounds(64, 214, 108, 36);
 		frmAd.getContentPane().add(btnNewButton);
+		
+		// Botão de teste para sensor
+		JRadioButton sensorTestButton = new JRadioButton("Sensor");
+		sensorTestButton.setBounds(49, 71, 123, 25);
+		frmAd.getContentPane().add(sensorTestButton);
+		sensorTestButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				robotController.sensorTest = sensorTestButton.isSelected();
+			}
+		});
+		
 	}
 }
