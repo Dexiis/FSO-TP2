@@ -33,11 +33,9 @@ public class RandomMovements implements Runnable {
 						this.wait();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-						Thread.currentThread().interrupt();
 					}
 				}
-				if (working)
-					STATE = StateEnum.GENERATE;
+				STATE = StateEnum.GENERATE;
 				break;
 
 			case GENERATE:
@@ -70,9 +68,9 @@ public class RandomMovements implements Runnable {
 
 					lastDirection = movement[direction];
 				}
-				
+
 				System.out.println(movementList);
-				
+
 				STATE = StateEnum.SEND;
 				break;
 
@@ -104,7 +102,8 @@ public class RandomMovements implements Runnable {
 
 	public synchronized void setWorking(boolean working) {
 		this.working = working;
-		this.notify();
+		if (working)
+			this.notify();
 	}
 
 	public synchronized void setActionNumber(int actionNumber) {

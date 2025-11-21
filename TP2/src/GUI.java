@@ -133,7 +133,7 @@ public class GUI implements ILogger {
 
 		textRobotName = new JTextField();
 
-		textRobotName.setText("EV4");
+		textRobotName.setText("EVA");
 		textRobotName.setHorizontalAlignment(SwingConstants.CENTER);
 		textRobotName.setFont(new Font("Tahoma	", Font.PLAIN, 18));
 		textRobotName.setColumns(10);
@@ -267,17 +267,6 @@ public class GUI implements ILogger {
 			}
 		});
 		btnNewButton.setBounds(64, 214, 108, 36);
-		frmAd.getContentPane().add(btnNewButton);
-		
-		// Botão de teste para sensor
-		JRadioButton sensorTestButton = new JRadioButton("Sensor");
-		sensorTestButton.setBounds(49, 71, 123, 25);
-		frmAd.getContentPane().add(sensorTestButton);
-		sensorTestButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				robotController.sensorTest = sensorTestButton.isSelected();
-			}
-		});
-		
+		frmAd.getContentPane().add(btnNewButton);	
 	}
 }

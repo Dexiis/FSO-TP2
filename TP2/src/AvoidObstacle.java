@@ -36,15 +36,10 @@ public class AvoidObstacle implements Runnable {
 						e.printStackTrace();
 					}
 					
-					/* MODO ROBO */
+					bufferManager.acquire();
 					if(robotController.robotOn && robotController.obstacleFound())
-						STATE = StateEnum.SEND;
-					
-					/* MODO TESTE 
-					if(robotController.obstacleFound())
 						STATE = StateEnum.GENERATE;
-					*/
-					
+					bufferManager.release();
 				}
 				break;
 			case GENERATE:

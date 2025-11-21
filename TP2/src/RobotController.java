@@ -4,15 +4,16 @@ public class RobotController implements Runnable {
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
 	private final RandomMovements randomMovements;
 	private final AvoidObstacle avoidObstacle;
+	private final BufferManager bufferManager;
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
 	private final Thread avoidObstacleThread;
 
 	public boolean robotOn = false;
-	
+
 	/* TESTE */
 	public boolean sensorTest = false;
-	
+
 	private ILogger logger;
 
 	private Movement movement;
@@ -22,6 +23,7 @@ public class RobotController implements Runnable {
 
 	public RobotController(BufferManager bufferManager, ILogger logger) {
 		this.logger = logger;
+		this.bufferManager = bufferManager;
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
 		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager);
 		this.randomMovementsThread = new Thread(randomMovements);
@@ -42,12 +44,13 @@ public class RobotController implements Runnable {
 						Thread.currentThread().interrupt();
 					}
 				}
-				if (!buffer.isEmpty())
-					bufferState = StateEnum.EXECUTE;
+				bufferState = StateEnum.EXECUTE;
 				break;
 			case EXECUTE:
+				bufferManager.acquire();
 				movement = buffer.get();
 				movement.doMovement();
+				bufferManager.release();
 				waitingTime = movement.getTime();
 				bufferState = StateEnum.WAIT;
 				break;
@@ -117,21 +120,17 @@ public class RobotController implements Runnable {
 		buffer.put(new Movement(robot, logger, MovementEnum.STOP));
 		notify();
 	}
-	
+
 	public synchronized boolean obstacleFound() {
 		/* MODO ROBO */
 		return robot.SensorToque(robot.S_1) == 1;
-		
-		/* MODO TESTE
-		return sensorTest;
-		*/
 	}
 
 	public synchronized void putBuffer(Movement movement) {
 		buffer.put(movement);
 		notify();
 	}
-	
+
 	public synchronized void putBufferHigherPriority(Movement movement) {
 		buffer.higherPriorityPut(movement);
 		notify();

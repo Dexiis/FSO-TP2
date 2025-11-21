@@ -19,6 +19,6 @@ public class BufferManager {
 
 	public synchronized void release() {
 		inUse = false;
-		notifyAll();
+		notify();
 	}
 }
