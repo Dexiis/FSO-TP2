@@ -1,8 +1,9 @@
-public class LeftMovement extends Movement {
+public class RightMovement extends Movement {
+
 	private int radius, angle;
 	private RobotLegoEV3 robot;
 
-	public LeftMovement(int radius, int angle, RobotLegoEV3 robot, ILogger logger) {
+	public RightMovement(int radius, int angle, RobotLegoEV3 robot, ILogger logger) {
 		super(logger);
 		this.radius = radius;
 		this.angle = angle;
@@ -10,8 +11,8 @@ public class LeftMovement extends Movement {
 	}
 
 	public void doMovement() {
-		robot.CurvarEsquerda(this.radius, this.angle);
-		log("O robô curvou à esquerda com um ângulo de " + this.angle + " graus e com um raio de " + this.radius
+		robot.CurvarDireita(this.radius, this.angle);
+		log("O robô curvou à direita com um ângulo de " + this.angle + " graus e com um raio de " + this.radius
 				+ " centímetros.\n");
 	}
 

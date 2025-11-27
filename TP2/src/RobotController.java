@@ -4,6 +4,7 @@ public class RobotController implements Runnable {
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
 	private final RandomMovements randomMovements;
 	private final AvoidObstacle avoidObstacle;
+	private final RobotManager robotManager;
 	private final BufferManager bufferManager;
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
@@ -23,9 +24,10 @@ public class RobotController implements Runnable {
 
 	public RobotController(BufferManager bufferManager, ILogger logger) {
 		this.logger = logger;
+		this.robotManager = new RobotManager();
 		this.bufferManager = bufferManager;
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
-		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager);
+		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager, robotManager);
 		this.randomMovementsThread = new Thread(randomMovements);
 		this.randomMovementsThread.start();
 		this.avoidObstacleThread = new Thread(avoidObstacle);
@@ -49,8 +51,12 @@ public class RobotController implements Runnable {
 			case EXECUTE:
 				bufferManager.acquire();
 				movement = buffer.get();
-				movement.doMovement();
 				bufferManager.release();
+
+				robotManager.acquire();
+				movement.doMovement();
+				robotManager.release();
+
 				waitingTime = movement.getTime();
 				bufferState = StateEnum.WAIT;
 				break;
@@ -97,27 +103,27 @@ public class RobotController implements Runnable {
 	}
 
 	public synchronized void bufferMoveForward() {
-		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, data.getDistance()));
+		buffer.put(new ForwardMovement(data.getDistance(), robot, logger));
 		notify();
 	}
 
 	public synchronized void bufferMoveBackwards() {
-		buffer.put(new Movement(robot, logger, MovementEnum.BACKWARDS, data.getDistance()));
+		buffer.put(new BackwardsMovement(data.getDistance(), robot, logger));
 		notify();
 	}
 
 	public synchronized void bufferMoveRightCurve() {
-		buffer.put(new Movement(robot, logger, MovementEnum.RIGHT, data.getRadius(), data.getAngle()));
+		buffer.put(new RightMovement(data.getRadius(), data.getAngle(), robot, logger));
 		notify();
 	}
 
 	public synchronized void bufferMoveLeftCurve() {
-		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, data.getRadius(), data.getAngle()));
+		buffer.put(new LeftMovement(data.getRadius(), data.getAngle(), robot, logger));
 		notify();
 	}
 
 	public synchronized void bufferStopMovement() {
-		buffer.put(new Movement(robot, logger, MovementEnum.STOP));
+		buffer.put(new StopMovement(robot, logger));
 		notify();
 	}
 
@@ -147,15 +153,14 @@ public class RobotController implements Runnable {
 	}
 
 	public void squareMovement() {
-		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, 20));
-		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, 0, 90));
-		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, 20));
-		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, 0, 90));
-		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, 20));
-		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, 0, 90));
-		buffer.put(new Movement(robot, logger, MovementEnum.FORWARD, 20));
-		buffer.put(new Movement(robot, logger, MovementEnum.LEFT, 0, 90));
-		stopMovementSync();
+		buffer.put(new ForwardMovement(20, robot, logger));
+		buffer.put(new LeftMovement(0, 90, robot, logger));
+		buffer.put(new ForwardMovement(20, robot, logger));
+		buffer.put(new LeftMovement(0, 90, robot, logger));
+		buffer.put(new ForwardMovement(20, robot, logger));
+		buffer.put(new LeftMovement(0, 90, robot, logger));
+		buffer.put(new ForwardMovement(20, robot, logger));
+		buffer.put(new LeftMovement(0, 90, robot, logger));
 	}
 
 	public void startRandomMovements() {

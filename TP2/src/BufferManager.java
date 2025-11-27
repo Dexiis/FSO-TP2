@@ -1,3 +1,4 @@
+
 public class BufferManager {
 
 	private boolean inUse = false;

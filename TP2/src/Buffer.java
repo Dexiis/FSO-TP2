@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 
 public class Buffer {
@@ -12,7 +13,7 @@ public class Buffer {
 		buffer.add(movement);
 		notifyAll();
 	}
-	
+
 	public synchronized void higherPriorityPut(Movement movement) {
 		buffer.add(0, movement);
 		notifyAll();

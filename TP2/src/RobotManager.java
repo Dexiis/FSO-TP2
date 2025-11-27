@@ -1,9 +1,10 @@
-public class RobotAccessManager {
-	
+
+public class RobotManager {
+
 	private boolean inUse = false;
-	
-	public RobotAccessManager() {
-		
+
+	public RobotManager() {
+
 	}
 
 	public synchronized void acquire() {
@@ -12,7 +13,6 @@ public class RobotAccessManager {
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				Thread.currentThread().interrupt();
 			}
 		}
 		inUse = true;
@@ -22,5 +22,5 @@ public class RobotAccessManager {
 		inUse = false;
 		notify();
 	}
-	
+
 }

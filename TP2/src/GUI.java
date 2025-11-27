@@ -1,3 +1,4 @@
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -267,6 +268,6 @@ public class GUI implements ILogger {
 			}
 		});
 		btnNewButton.setBounds(64, 214, 108, 36);
-		frmAd.getContentPane().add(btnNewButton);	
+		frmAd.getContentPane().add(btnNewButton);
 	}
 }

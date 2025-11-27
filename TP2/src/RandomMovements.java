@@ -3,7 +3,6 @@ import java.util.Random;
 public class RandomMovements implements Runnable {
 
 	private StateEnum STATE = StateEnum.IDLE;
-	private MovementEnum lastDirection = null;
 
 	private volatile boolean working = false;
 
@@ -15,6 +14,7 @@ public class RandomMovements implements Runnable {
 	private RobotLegoEV3 robot;
 	private ILogger logger;
 	private Movement[] movementList;
+	private MovementEnum lastDirection = null;
 
 	public RandomMovements(RobotLegoEV3 robot, ILogger logger, RobotController robotController,
 			BufferManager bufferManager) {
@@ -52,18 +52,21 @@ public class RandomMovements implements Runnable {
 					}
 
 					if (movement[direction] == MovementEnum.FORWARD)
-						movementList[i * 2] = (new Movement(robot, this.logger, movement[direction],
-								random.nextInt(40) + 10));
-					else if (movement[direction] == MovementEnum.RIGHT || movement[direction] == MovementEnum.LEFT)
-						movementList[i * 2] = (new Movement(robot, this.logger, movement[direction],
-								random.nextInt(20) + 10, random.nextInt(70) + 20));
+						movementList[i * 2] = (new ForwardMovement((random.nextInt(40) + 10), robot, logger));
+					else if (movement[direction] == MovementEnum.RIGHT)
+						movementList[i * 2] = (new RightMovement(random.nextInt(20) + 10, random.nextInt(70) + 20,
+								robot, logger));
+					else if (movement[direction] == MovementEnum.LEFT)
+						movementList[i * 2] = (new LeftMovement(random.nextInt(20) + 10, random.nextInt(70) + 20, robot,
+								logger));
 					else {
 						i--;
 						continue;
 					}
+
 					waitingTime += movementList[i * 2].getTime();
 
-					movementList[i * 2 + 1] = (new Movement(robot, this.logger, MovementEnum.STOP));
+					movementList[i * 2 + 1] = (new StopMovement(robot, this.logger));
 					waitingTime += movementList[i * 2 + 1].getTime();
 
 					lastDirection = movement[direction];
@@ -76,9 +79,8 @@ public class RandomMovements implements Runnable {
 
 			case SEND:
 				bufferManager.acquire();
-				for (int i = 0; i < this.actionNumber * 2; i++) {
+				for (int i = 0; i < this.actionNumber * 2; i++)
 					robotController.putBuffer(movementList[i]);
-				}
 				bufferManager.release();
 				STATE = StateEnum.WAIT;
 				break;
