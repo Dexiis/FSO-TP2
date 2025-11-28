@@ -12,9 +12,6 @@ public class RobotController implements Runnable {
 
 	public boolean robotOn = false;
 
-	/* TESTE */
-	public boolean sensorTest = false;
-
 	private ILogger logger;
 
 	private Movement movement;
@@ -106,7 +103,7 @@ public class RobotController implements Runnable {
 	}
 
 	public void turnOffRobot() {
-		// robot.CloseEV3();
+		robot.CloseEV3();
 	}
 
 	public synchronized void bufferMoveForward() {
@@ -141,7 +138,6 @@ public class RobotController implements Runnable {
 		bufferManager.acquire();
 		buffer.put(new StopMovement(robot, logger));
 		bufferManager.release();
-
 		notify();
 	}
 
