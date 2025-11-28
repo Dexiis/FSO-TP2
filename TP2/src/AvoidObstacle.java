@@ -33,9 +33,8 @@ public class AvoidObstacle implements Runnable {
 			switch (STATE) {
 			case IDLE:
 				synchronized (this) {
-					// Ver de 50 em 50 ms (sem thread sleep)
 					try {
-						Thread.sleep(50);
+						wait(50);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

@@ -158,7 +158,6 @@ public class RobotController implements Runnable {
 		new StopMovement(robot, logger).doMovement();;
 		robotManager.release();
 		this.waitingTime = 0;
-		log("O robô parou por completo.\n");
 	}
 
 	public void stopMovementSync() {
