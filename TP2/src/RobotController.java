@@ -1,11 +1,11 @@
 public class RobotController implements Runnable {
 
-	private final Data data = new Data(0, 0, 0, 0, null);
+	private final Data data = new Data();
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
 	private final RandomMovements randomMovements;
 	private final AvoidObstacle avoidObstacle;
 	private final RobotManager robotManager;
-	private final BufferManager bufferManager;
+	private final BufferManager bufferManager = new BufferManager();
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
 	private final Thread avoidObstacleThread;
@@ -22,10 +22,9 @@ public class RobotController implements Runnable {
 
 	private long waitingTime;
 
-	public RobotController(BufferManager bufferManager, ILogger logger) {
+	public RobotController(ILogger logger) {
 		this.logger = logger;
 		this.robotManager = new RobotManager();
-		this.bufferManager = bufferManager;
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
 		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager, robotManager);
 		this.randomMovementsThread = new Thread(randomMovements);
@@ -85,16 +84,24 @@ public class RobotController implements Runnable {
 		}
 	}
 
-	public void updateData(String radius, String angle, String distance, String name, String actionNumber) {
-		data.setRadius(Integer.parseInt(radius));
-		data.setAngle(Integer.parseInt(angle));
-		data.setDistance(Integer.parseInt(distance));
-		data.setName(name);
-		data.setActionNumber(Integer.parseInt(actionNumber));
+	public void updateRadius(int radius) {
+		data.setRadius(radius);
 	}
 
-	public void turnOnRobot() {
-		robot.OpenEV3(data.getName());
+	public void updateAngle(int angle) {
+		data.setAngle(angle);
+	}
+
+	public void updateDistance(int distance) {
+		data.setDistance(distance);
+	}
+
+	public void updateActionNumber(int actionNumber) {
+		data.setActionNumber(actionNumber);
+	}
+
+	public void turnOnRobot(String name) {
+		robot.OpenEV3(name);
 		this.robotOn = true;
 	}
 
@@ -103,33 +110,39 @@ public class RobotController implements Runnable {
 	}
 
 	public synchronized void bufferMoveForward() {
+		bufferManager.acquire();
 		buffer.put(new ForwardMovement(data.getDistance(), robot, logger));
+		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferMoveBackwards() {
+		bufferManager.acquire();
 		buffer.put(new BackwardsMovement(data.getDistance(), robot, logger));
+		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferMoveRightCurve() {
+		bufferManager.acquire();
 		buffer.put(new RightMovement(data.getRadius(), data.getAngle(), robot, logger));
+		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferMoveLeftCurve() {
+		bufferManager.acquire();
 		buffer.put(new LeftMovement(data.getRadius(), data.getAngle(), robot, logger));
+		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferStopMovement() {
+		bufferManager.acquire();
 		buffer.put(new StopMovement(robot, logger));
-		notify();
-	}
+		bufferManager.release();
 
-	public synchronized boolean obstacleFound() {
-		/* MODO ROBO */
-		return robot.SensorToque(robot.S_1) == 1;
+		notify();
 	}
 
 	public synchronized void putBuffer(Movement movement) {
@@ -143,9 +156,11 @@ public class RobotController implements Runnable {
 	}
 
 	public void stopMovement() {
-		robot.Parar(true);
+		bufferManager.acquire();
+		putBufferHigherPriority(new StopMovement(robot, logger));
+		bufferManager.release();
 		this.waitingTime = 0;
-		log("O robô parou.\n");
+		log("O robô parou por completo.\n");
 	}
 
 	public void stopMovementSync() {
@@ -153,14 +168,18 @@ public class RobotController implements Runnable {
 	}
 
 	public void squareMovement() {
-		buffer.put(new ForwardMovement(20, robot, logger));
-		buffer.put(new LeftMovement(0, 90, robot, logger));
-		buffer.put(new ForwardMovement(20, robot, logger));
-		buffer.put(new LeftMovement(0, 90, robot, logger));
-		buffer.put(new ForwardMovement(20, robot, logger));
-		buffer.put(new LeftMovement(0, 90, robot, logger));
-		buffer.put(new ForwardMovement(20, robot, logger));
-		buffer.put(new LeftMovement(0, 90, robot, logger));
+		bufferMoveForward();
+		bufferMoveLeftCurve();
+		bufferMoveForward();
+		bufferMoveLeftCurve();
+		bufferMoveForward();
+		bufferMoveLeftCurve();
+		bufferMoveForward();
+		bufferMoveLeftCurve();
+	}
+
+	public synchronized boolean obstacleFound() {
+		return robot.SensorToque(robot.S_1) == 1;
 	}
 
 	public void startRandomMovements() {

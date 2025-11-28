@@ -34,7 +34,6 @@ public class GUI implements ILogger {
 
 	private final Thread robotControllerThread;
 
-	private final BufferManager bufferManager = new BufferManager();
 	private final RobotController robotController;
 
 	public static void main(String[] args) {
@@ -56,16 +55,14 @@ public class GUI implements ILogger {
 	}
 
 	public GUI() {
-		this.robotController = new RobotController(bufferManager, this);
+		this.robotController = new RobotController(this);
 		this.robotControllerThread = new Thread(robotController);
 		robotControllerThread.start();
 		initialize();
-		updateData();
-	}
-
-	public void updateData() {
-		robotController.updateData(textRadius.getText(), textAngle.getText(), textDistance.getText(),
-				textRobotName.getText(), spinnerNumber.getValue().toString());
+		robotController.updateActionNumber(Integer.parseInt(spinnerNumber.getValue().toString()));
+		robotController.updateDistance(Integer.parseInt(textDistance.getText()));
+		robotController.updateRadius(Integer.parseInt(textRadius.getText()));
+		robotController.updateAngle(Integer.parseInt(textAngle.getText()));
 	}
 
 	private void initialize() {
@@ -151,7 +148,7 @@ public class GUI implements ILogger {
 		spinnerNumber = new JSpinner();
 		spinnerNumber.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				updateData();
+				robotController.updateActionNumber(Integer.parseInt(spinnerNumber.getValue().toString()));
 			}
 		});
 		spinnerNumber.setModel(new SpinnerNumberModel(Integer.valueOf(5), null, null, Integer.valueOf(1)));
@@ -163,7 +160,7 @@ public class GUI implements ILogger {
 		rdbtnRandomMovements = new JRadioButton("Random Movements");
 		rdbtnRandomMovements.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
+				robotController.updateActionNumber(Integer.parseInt(spinnerNumber.getValue().toString()));
 				if (rdbtnRandomMovements.isSelected()) {
 					robotController.startRandomMovements();
 				} else {
@@ -181,9 +178,8 @@ public class GUI implements ILogger {
 		frmAd.getContentPane().add(chckbxOnOff);
 		chckbxOnOff.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
 				if (chckbxOnOff.isSelected())
-					robotController.turnOnRobot();
+					robotController.turnOnRobot(textRobotName.getText());
 				else
 					robotController.turnOffRobot();
 			}
@@ -195,10 +191,9 @@ public class GUI implements ILogger {
 		btnFoward.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		btnFoward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
-				bufferManager.acquire();
+				robotController.updateDistance(Integer.parseInt(textDistance.getText()));
+
 				robotController.bufferMoveForward();
-				bufferManager.release();
 			}
 		});
 		btnFoward.setBounds(246, 106, 156, 36);
@@ -208,7 +203,6 @@ public class GUI implements ILogger {
 		btnStop.setBackground(new Color(217, 0, 5));
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
 				robotController.stopMovement();
 				robotController.clearBuffer();
 				robotController.stopRandomMovements();
@@ -223,10 +217,10 @@ public class GUI implements ILogger {
 		btnLeft.setBackground(new Color(255, 255, 0));
 		btnLeft.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
-				bufferManager.acquire();
+				robotController.updateRadius(Integer.parseInt(textRadius.getText()));
+				robotController.updateAngle(Integer.parseInt(textAngle.getText()));
+
 				robotController.bufferMoveLeftCurve();
-				bufferManager.release();
 			}
 		});
 		btnLeft.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -240,10 +234,10 @@ public class GUI implements ILogger {
 		frmAd.getContentPane().add(btnRight);
 		btnRight.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
-				bufferManager.acquire();
+				robotController.updateRadius(Integer.parseInt(textRadius.getText()));
+				robotController.updateAngle(Integer.parseInt(textAngle.getText()));
+
 				robotController.bufferMoveRightCurve();
-				bufferManager.release();
 			}
 		});
 
@@ -251,10 +245,9 @@ public class GUI implements ILogger {
 		btnBackwards.setBackground(new Color(192, 192, 192));
 		btnBackwards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateData();
-				bufferManager.acquire();
+				robotController.updateDistance(Integer.parseInt(textDistance.getText()));
+
 				robotController.bufferMoveBackwards();
-				bufferManager.release();
 			}
 		});
 		btnBackwards.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -264,6 +257,13 @@ public class GUI implements ILogger {
 		JButton btnNewButton = new JButton("Square");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				textDistance.setText("20");
+				robotController.updateDistance(20);
+				textAngle.setText("90");
+				robotController.updateAngle(90);
+				textRadius.setText("0");
+				robotController.updateRadius(0);
+				
 				robotController.squareMovement();
 			}
 		});
