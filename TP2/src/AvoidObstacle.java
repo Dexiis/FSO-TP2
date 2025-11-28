@@ -8,10 +8,10 @@ public class AvoidObstacle implements Runnable {
 	private static final int MOVEMENT_NUMBER = 3;
 
 	private RobotController robotController;
-	private BufferManager bufferManager;
+	private AccessManager bufferManager;
 	private ILogger logger;
 	private RobotLegoEV3 robot;
-	private RobotManager robotManager;
+	private AccessManager robotManager;
 	private long waitingTime = 0;
 
 	private Random random = new Random();
@@ -19,7 +19,7 @@ public class AvoidObstacle implements Runnable {
 	private Movement[] movementList = new Movement[MOVEMENT_NUMBER];
 
 	public AvoidObstacle(RobotLegoEV3 robot, ILogger logger, RobotController robotController,
-			BufferManager bufferManager, RobotManager robotManager) {
+			AccessManager bufferManager, AccessManager robotManager) {
 		this.robotManager = robotManager;
 		this.robotController = robotController;
 		this.bufferManager = bufferManager;
@@ -57,10 +57,10 @@ public class AvoidObstacle implements Runnable {
 					int direction = random.nextInt(movement.length);
 
 					if (movement[direction] == MovementEnum.LEFT) {
-						movementList[2] = new LeftMovement(0, 90, this.robot, this.logger);
+						movementList[2] = new LeftMovement(10, 90, this.robot, this.logger);
 						break;
 					} else if (movement[direction] == MovementEnum.RIGHT) {
-						movementList[2] = new RightMovement(0, 90, this.robot, this.logger);
+						movementList[2] = new RightMovement(10, 90, this.robot, this.logger);
 						break;
 					}
 				}
@@ -84,7 +84,7 @@ public class AvoidObstacle implements Runnable {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-
+				
 				STATE = StateEnum.IDLE;
 
 				break;

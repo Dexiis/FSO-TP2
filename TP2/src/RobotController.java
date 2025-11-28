@@ -4,8 +4,8 @@ public class RobotController implements Runnable {
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
 	private final RandomMovements randomMovements;
 	private final AvoidObstacle avoidObstacle;
-	private final RobotManager robotManager;
-	private final BufferManager bufferManager = new BufferManager();
+	private final AccessManager robotManager;
+	private final AccessManager bufferManager = new AccessManager();
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
 	private final Thread avoidObstacleThread;
@@ -21,7 +21,7 @@ public class RobotController implements Runnable {
 
 	public RobotController(ILogger logger) {
 		this.logger = logger;
-		this.robotManager = new RobotManager();
+		this.robotManager = new AccessManager();
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
 		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager, robotManager);
 		this.randomMovementsThread = new Thread(randomMovements);
@@ -65,9 +65,8 @@ public class RobotController implements Runnable {
 				if (buffer.isEmpty()) {
 					bufferState = StateEnum.IDLE;
 					stopMovementSync();
-				} else {
+				} else
 					bufferState = StateEnum.EXECUTE;
-				}
 				break;
 			default:
 				break;
@@ -76,9 +75,8 @@ public class RobotController implements Runnable {
 	}
 
 	private void log(String message) {
-		if (logger != null) {
+		if (logger != null)
 			logger.logMessage(message);
-		}
 	}
 
 	public void updateRadius(int radius) {
@@ -98,12 +96,16 @@ public class RobotController implements Runnable {
 	}
 
 	public void turnOnRobot(String name) {
+		robotManager.acquire();
 		robot.OpenEV3(name);
+		robotManager.release();
 		this.robotOn = true;
 	}
 
 	public void turnOffRobot() {
+		robotManager.acquire();
 		robot.CloseEV3();
+		robotManager.release();
 	}
 
 	public synchronized void bufferMoveForward() {
@@ -152,15 +154,17 @@ public class RobotController implements Runnable {
 	}
 
 	public void stopMovement() {
-		bufferManager.acquire();
-		putBufferHigherPriority(new StopMovement(robot, logger));
-		bufferManager.release();
+		robotManager.acquire();
+		new StopMovement(robot, logger).doMovement();;
+		robotManager.release();
 		this.waitingTime = 0;
 		log("O robô parou por completo.\n");
 	}
 
 	public void stopMovementSync() {
+		robotManager.acquire();
 		robot.Parar(false);
+		robotManager.release();
 	}
 
 	public void squareMovement() {

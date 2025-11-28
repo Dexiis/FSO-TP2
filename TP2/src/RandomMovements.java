@@ -10,14 +10,14 @@ public class RandomMovements implements Runnable {
 	private long waitingTime = 0;
 	private Random random = new Random();
 	private RobotController robotController;
-	private BufferManager bufferManager;
+	private AccessManager bufferManager;
 	private RobotLegoEV3 robot;
 	private ILogger logger;
 	private Movement[] movementList;
 	private MovementEnum lastDirection = null;
 
 	public RandomMovements(RobotLegoEV3 robot, ILogger logger, RobotController robotController,
-			BufferManager bufferManager) {
+			AccessManager bufferManager) {
 		this.robot = robot;
 		this.logger = logger;
 		this.robotController = robotController;
@@ -36,8 +36,8 @@ public class RandomMovements implements Runnable {
 					}
 				}
 				STATE = StateEnum.GENERATE;
+				
 				break;
-
 			case GENERATE:
 				movementList = new Movement[actionNumber * 2];
 				waitingTime = 0;
@@ -71,20 +71,17 @@ public class RandomMovements implements Runnable {
 
 					lastDirection = movement[direction];
 				}
-
-				System.out.println(movementList);
-
-				STATE = StateEnum.SEND;
+				STATE = StateEnum.SEND; 
+				
 				break;
-
 			case SEND:
 				bufferManager.acquire();
 				for (int i = 0; i < this.actionNumber * 2; i++)
 					robotController.putBuffer(movementList[i]);
 				bufferManager.release();
 				STATE = StateEnum.WAIT;
+				
 				break;
-
 			case WAIT:
 				try {
 					Thread.sleep(waitingTime + 4000);
@@ -95,6 +92,7 @@ public class RandomMovements implements Runnable {
 					STATE = StateEnum.GENERATE;
 				else
 					STATE = StateEnum.IDLE;
+				
 				break;
 			default:
 				break;

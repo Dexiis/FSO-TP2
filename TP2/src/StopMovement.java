@@ -8,7 +8,7 @@ public class StopMovement extends Movement {
 
 	public void doMovement() {
 		robot.Parar(true);
-		log("O robô parou.");
+		log("O robô parou. ");
 	}
 
 	public int getTime() {

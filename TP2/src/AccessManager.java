@@ -1,9 +1,9 @@
 
-public class BufferManager {
+public class AccessManager {
 
 	private boolean inUse = false;
 
-	public BufferManager() {
+	public AccessManager() {
 	}
 
 	public synchronized void acquire() {

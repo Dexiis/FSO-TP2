@@ -146,7 +146,7 @@ public class GUI implements ILogger {
 
 		textRobotName.setText("EVA");
 		textRobotName.setHorizontalAlignment(SwingConstants.CENTER);
-		textRobotName.setFont(new Font("Arial	", Font.PLAIN, 18));
+		textRobotName.setFont(new Font("Arial", Font.PLAIN, 18));
 		textRobotName.setColumns(10);
 		textRobotName.setBounds(600, 11, 100, 30);
 		frmAd.getContentPane().add(textRobotName);
@@ -198,10 +198,10 @@ public class GUI implements ILogger {
 			}
 		});
 
-		JButton btnFoward = new JButton("FORWARD");
+		JButton btnFoward = new JButton("^");
 		btnFoward.setForeground(new Color(0, 0, 0));
 		btnFoward.setBackground(new Color(128, 255, 128));
-		btnFoward.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnFoward.setFont(new Font("Arial", Font.BOLD, 22));
 		btnFoward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				robotController.updateDistance(Integer.parseInt(textDistance.getText()));
@@ -216,17 +216,17 @@ public class GUI implements ILogger {
 		btnStop.setBackground(new Color(217, 0, 5));
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				robotController.stopMovement();
 				robotController.clearBuffer();
+				robotController.stopMovement();
 				robotController.stopRandomMovements();
 				rdbtnRandomMovements.setSelected(false);
 			}
 		});
-		btnStop.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnStop.setFont(new Font("Arial", Font.BOLD, 18));
 		btnStop.setBounds(275, 140, 150, 40);
 		frmAd.getContentPane().add(btnStop);
 
-		JButton btnLeft = new JButton("LEFT");
+		JButton btnLeft = new JButton("<");
 		btnLeft.setBackground(new Color(255, 255, 0));
 		btnLeft.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -236,13 +236,13 @@ public class GUI implements ILogger {
 				robotController.bufferMoveLeftCurve();
 			}
 		});
-		btnLeft.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnLeft.setFont(new Font("Arial", Font.BOLD, 18));
 		btnLeft.setBounds(125, 140, 150, 40);
 		frmAd.getContentPane().add(btnLeft);
 
-		JButton btnRight = new JButton("RIGHT");
+		JButton btnRight = new JButton(">");
 		btnRight.setBackground(new Color(0, 128, 192));
-		btnRight.setFont(new Font("Arial", Font.PLAIN, 20));
+		btnRight.setFont(new Font("Arial", Font.BOLD, 18));
 		btnRight.setBounds(425, 140, 150, 40);
 		frmAd.getContentPane().add(btnRight);
 		btnRight.addActionListener(new ActionListener() {
@@ -254,7 +254,7 @@ public class GUI implements ILogger {
 			}
 		});
 
-		JButton btnBackwards = new JButton("BACKWARDS");
+		JButton btnBackwards = new JButton("v");
 		btnBackwards.setBackground(new Color(192, 192, 192));
 		btnBackwards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -263,7 +263,7 @@ public class GUI implements ILogger {
 				robotController.bufferMoveBackwards();
 			}
 		});
-		btnBackwards.setFont(new Font("Arial", Font.BOLD, 20));
+		btnBackwards.setFont(new Font("Arial", Font.BOLD, 18));
 		btnBackwards.setBounds(275, 180, 150, 40);
 		frmAd.getContentPane().add(btnBackwards);
 
