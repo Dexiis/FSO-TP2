@@ -7,7 +7,7 @@ public class AvoidObstacle implements Runnable {
 
 	private static final int MOVEMENT_NUMBER = 3;
 
-	private RobotController robotController;
+	private Controller robotController;
 	private AccessManager bufferManager;
 	private ILogger logger;
 	private RobotLegoEV3 robot;
@@ -18,7 +18,7 @@ public class AvoidObstacle implements Runnable {
 
 	private Movement[] movementList = new Movement[MOVEMENT_NUMBER];
 
-	public AvoidObstacle(RobotLegoEV3 robot, ILogger logger, RobotController robotController,
+	public AvoidObstacle(RobotLegoEV3 robot, ILogger logger, Controller robotController,
 			AccessManager bufferManager, AccessManager robotManager) {
 		this.robotManager = robotManager;
 		this.robotController = robotController;

@@ -1,10 +1,10 @@
-public class RobotController implements Runnable {
+public class Controller implements Runnable {
 
 	private final Data data = new Data();
 	private final RobotLegoEV3 robot = new RobotLegoEV3();
 	private final RandomMovements randomMovements;
 	private final AvoidObstacle avoidObstacle;
-	private final AccessManager robotManager;
+	private final AccessManager robotManager = new AccessManager();
 	private final AccessManager bufferManager = new AccessManager();
 	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
@@ -19,13 +19,14 @@ public class RobotController implements Runnable {
 
 	private long waitingTime;
 
-	public RobotController(ILogger logger) {
+	public Controller(ILogger logger) {
 		this.logger = logger;
-		this.robotManager = new AccessManager();
+		
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
-		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager, robotManager);
 		this.randomMovementsThread = new Thread(randomMovements);
 		this.randomMovementsThread.start();
+		
+		this.avoidObstacle = new AvoidObstacle(robot, logger, this, bufferManager, robotManager);
 		this.avoidObstacleThread = new Thread(avoidObstacle);
 		this.avoidObstacleThread.start();
 	}
@@ -74,11 +75,6 @@ public class RobotController implements Runnable {
 		}
 	}
 
-	private void log(String message) {
-		if (logger != null)
-			logger.logMessage(message);
-	}
-
 	public void updateRadius(int radius) {
 		data.setRadius(radius);
 	}
@@ -106,6 +102,7 @@ public class RobotController implements Runnable {
 		robotManager.acquire();
 		robot.CloseEV3();
 		robotManager.release();
+		this.robotOn = false;
 	}
 
 	public synchronized void bufferMoveForward() {

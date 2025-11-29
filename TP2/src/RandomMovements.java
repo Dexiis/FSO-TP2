@@ -9,14 +9,14 @@ public class RandomMovements implements Runnable {
 	private volatile int actionNumber = 0;
 	private long waitingTime = 0;
 	private Random random = new Random();
-	private RobotController robotController;
+	private Controller robotController;
 	private AccessManager bufferManager;
 	private RobotLegoEV3 robot;
 	private ILogger logger;
 	private Movement[] movementList;
 	private MovementEnum lastDirection = null;
 
-	public RandomMovements(RobotLegoEV3 robot, ILogger logger, RobotController robotController,
+	public RandomMovements(RobotLegoEV3 robot, ILogger logger, Controller robotController,
 			AccessManager bufferManager) {
 		this.robot = robot;
 		this.logger = logger;

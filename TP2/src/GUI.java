@@ -36,7 +36,7 @@ public class GUI implements ILogger {
 
 	private final Thread robotControllerThread;
 
-	private final RobotController robotController;
+	private final Controller robotController;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -57,7 +57,7 @@ public class GUI implements ILogger {
 	}
 
 	public GUI() {
-		this.robotController = new RobotController(this);
+		this.robotController = new Controller(this);
 		this.robotControllerThread = new Thread(robotController);
 		robotControllerThread.start();
 		initialize();
