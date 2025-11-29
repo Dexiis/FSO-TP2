@@ -7,7 +7,7 @@ public class AvoidObstacle implements Runnable {
 
 	private static final int MOVEMENT_NUMBER = 3;
 
-	private Controller robotController;
+	private Controller controller;
 	private AccessManager bufferManager;
 	private ILogger logger;
 	private RobotLegoEV3 robot;
@@ -18,10 +18,10 @@ public class AvoidObstacle implements Runnable {
 
 	private Movement[] movementList = new Movement[MOVEMENT_NUMBER];
 
-	public AvoidObstacle(RobotLegoEV3 robot, ILogger logger, Controller robotController,
+	public AvoidObstacle(RobotLegoEV3 robot, ILogger logger, Controller controller,
 			AccessManager bufferManager, AccessManager robotManager) {
 		this.robotManager = robotManager;
-		this.robotController = robotController;
+		this.controller = controller;
 		this.bufferManager = bufferManager;
 		this.logger = logger;
 		this.robot = robot;
@@ -40,7 +40,7 @@ public class AvoidObstacle implements Runnable {
 					}
 
 					robotManager.acquire();
-					if (robotController.robotOn && robotController.obstacleFound())
+					if (controller.robotOn && controller.obstacleFound())
 						STATE = StateEnum.GENERATE;
 					robotManager.release();
 				}
@@ -72,7 +72,7 @@ public class AvoidObstacle implements Runnable {
 			case SEND:
 				bufferManager.acquire();
 				for (int i = MOVEMENT_NUMBER - 1; i >= 0; i--)
-					robotController.putBufferHigherPriority(movementList[i]);
+					controller.putBufferHigherPriority(movementList[i]);
 				bufferManager.release();
 
 				STATE = StateEnum.WAIT;

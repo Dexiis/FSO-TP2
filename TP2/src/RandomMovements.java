@@ -9,18 +9,18 @@ public class RandomMovements implements Runnable {
 	private volatile int actionNumber = 0;
 	private long waitingTime = 0;
 	private Random random = new Random();
-	private Controller robotController;
+	private Controller controller;
 	private AccessManager bufferManager;
 	private RobotLegoEV3 robot;
 	private ILogger logger;
 	private Movement[] movementList;
 	private MovementEnum lastDirection = null;
 
-	public RandomMovements(RobotLegoEV3 robot, ILogger logger, Controller robotController,
+	public RandomMovements(RobotLegoEV3 robot, ILogger logger, Controller controller,
 			AccessManager bufferManager) {
 		this.robot = robot;
 		this.logger = logger;
-		this.robotController = robotController;
+		this.controller = controller;
 		this.bufferManager = bufferManager;
 	}
 
@@ -77,7 +77,7 @@ public class RandomMovements implements Runnable {
 			case SEND:
 				bufferManager.acquire();
 				for (int i = 0; i < this.actionNumber * 2; i++)
-					robotController.putBuffer(movementList[i]);
+					controller.putBuffer(movementList[i]);
 				bufferManager.release();
 				STATE = StateEnum.WAIT;
 				

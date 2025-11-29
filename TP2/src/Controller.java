@@ -40,7 +40,6 @@ public class Controller implements Runnable {
 						this.wait();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-						Thread.currentThread().interrupt();
 					}
 				}
 				bufferState = StateEnum.EXECUTE;
