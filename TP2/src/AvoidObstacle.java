@@ -12,7 +12,6 @@ public class AvoidObstacle implements Runnable {
 	private ILogger logger;
 	private RobotLegoEV3 robot;
 	private AccessManager robotManager;
-	private long waitingTime = 0;
 
 	private Random random = new Random();
 
@@ -46,8 +45,6 @@ public class AvoidObstacle implements Runnable {
 				}
 				break;
 			case GENERATE:
-				waitingTime = 0;
-
 				movementList[0] = new StopMovement(this.robot, this.logger);
 				movementList[1] = new BackwardsMovement(20, this.robot, this.logger);
 
@@ -64,9 +61,6 @@ public class AvoidObstacle implements Runnable {
 					}
 				}
 
-				for (Movement movement : movementList)
-					waitingTime += movement.getTime();
-
 				STATE = StateEnum.SEND;
 
 			case SEND:
@@ -79,7 +73,7 @@ public class AvoidObstacle implements Runnable {
 				break;
 			case WAIT:
 				try {
-					Thread.sleep(waitingTime);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
