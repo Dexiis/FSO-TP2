@@ -1,0 +1,19 @@
+import java.awt.EventQueue;
+
+public class Main {
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GUI recorderWindow = new RecorderGUI();
+					GUI rmWindow = new RandomMovementsGUI();
+					recorderWindow.frmAd.setVisible(true);
+					rmWindow.frmAd.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+}

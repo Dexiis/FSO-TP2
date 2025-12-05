@@ -1,6 +1,3 @@
-
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -18,38 +15,23 @@ import javax.swing.JSpinner;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 
-public class GUI implements ILogger {
+public abstract class GUI implements ILogger {
 
-	private JFrame frmAd;
-	private JTextField textRadius;
-	private JTextField textAngle;
-	private JTextField textDistance;
-	private JTextField textRobotName;
-	private JCheckBox chckbxOnOff;
-	private JSpinner spinnerNumber;
-	private JRadioButton rdbtnRandomMovements;
-	private JTextArea textArea;
+	protected JFrame frmAd;
+	protected JTextField textRadius;
+	protected JTextField textAngle;
+	protected JTextField textDistance;
+	protected JTextField textRobotName;
+	protected JCheckBox chckbxOnOff;
+	protected JSpinner spinnerNumber;
+	protected JTextArea textArea;
+	protected JRadioButton rdbtnRandomMovements;
 
-	private final Thread robotControllerThread;
+	protected final Thread robotControllerThread;
 
-	private final Controller robotController;
-
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GUI window = new GUI();
-					window.frmAd.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	protected final Controller robotController;
+	protected final Record record = new Record();
 
 	@Override
 	public void logMessage(String message) {
@@ -57,11 +39,10 @@ public class GUI implements ILogger {
 	}
 
 	public GUI() {
-		this.robotController = new Controller(this);
+		this.robotController = new Controller(this, this.record);
 		this.robotControllerThread = new Thread(robotController);
 		robotControllerThread.start();
 		initialize();
-		robotController.updateActionNumber(Integer.parseInt(spinnerNumber.getValue().toString()));
 		robotController.updateDistance(Integer.parseInt(textDistance.getText()));
 		robotController.updateRadius(Integer.parseInt(textRadius.getText()));
 		robotController.updateAngle(Integer.parseInt(textAngle.getText()));
@@ -104,11 +85,6 @@ public class GUI implements ILogger {
 		lblRobot.setFont(new Font("Arial", Font.PLAIN, 18));
 		lblRobot.setBounds(540, 10, 59, 29);
 		frmAd.getContentPane().add(lblRobot);
-
-		JLabel lblNumber = new JLabel("Number");
-		lblNumber.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblNumber.setBounds(390, 250, 71, 29);
-		frmAd.getContentPane().add(lblNumber);
 
 		JLabel lblLogger = new JLabel("Logger");
 		lblLogger.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -157,33 +133,6 @@ public class GUI implements ILogger {
 
 		textArea = new JTextArea();
 		scrollPane.setViewportView(textArea);
-
-		spinnerNumber = new JSpinner();
-		spinnerNumber.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				robotController.updateActionNumber(Integer.parseInt(spinnerNumber.getValue().toString()));
-			}
-		});
-		spinnerNumber.setModel(new SpinnerNumberModel(Integer.valueOf(5), null, null, Integer.valueOf(1)));
-
-		spinnerNumber.setFont(new Font("Arial", Font.PLAIN, 18));
-		spinnerNumber.setBounds(460, 250, 42, 29);
-		frmAd.getContentPane().add(spinnerNumber);
-
-		rdbtnRandomMovements = new JRadioButton("Random Movements");
-		rdbtnRandomMovements.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				robotController.updateActionNumber(Integer.parseInt(spinnerNumber.getValue().toString()));
-				if (rdbtnRandomMovements.isSelected()) {
-					robotController.startRandomMovements();
-				} else {
-					robotController.stopRandomMovements();
-				}
-			}
-		});
-		rdbtnRandomMovements.setFont(new Font("Arial", Font.PLAIN, 18));
-		rdbtnRandomMovements.setBounds(505, 255, 189, 20);
-		frmAd.getContentPane().add(rdbtnRandomMovements);
 
 		chckbxOnOff = new JCheckBox("Turn On");
 		chckbxOnOff.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -283,40 +232,10 @@ public class GUI implements ILogger {
 		});
 		btnSquare.setBounds(10, 250, 100, 35);
 		frmAd.getContentPane().add(btnSquare);
-
-		JLabel lblFile = new JLabel("File");
-		lblFile.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblFile.setBounds(10, 320, 33, 29);
-		frmAd.getContentPane().add(lblFile);
-
-		JButton btnRecord = new JButton("Record");
-		btnRecord.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// TODO Clica uma vez para ativar (cor do botão vermelho). Clicar denovo para
-				// desligar (cor neutra atual).
-				// caso seja apenas para os movimentos da GUI então chamar a função na GUI que
-				// armazena todos os movimentos clicacos num array. Quando o botão é clicado
-				// para parar de dar record, então envia o array para o data.
-
-				// Quando ligado desativa o botão de play e a barra para introduzir ficheiros
-			}
-		});
-		btnRecord.setFont(new Font("Arial", Font.PLAIN, 16));
-		btnRecord.setBounds(250, 420, 100, 35);
-		frmAd.getContentPane().add(btnRecord);
-
-		JButton btnPlay = new JButton("Play");
-		btnPlay.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// TODO Chama a função do robotController que coloca o array de movimentos
-				// guardado no data para o buffer.
-			}
-		});
-
-		// TODO adicionar barra de introdução de ficheiros
-
-		btnPlay.setFont(new Font("Arial", Font.PLAIN, 16));
-		btnPlay.setBounds(350, 420, 100, 35);
-		frmAd.getContentPane().add(btnPlay);
+		
+		addedFeatures();
+		
 	}
+	
+	protected abstract void addedFeatures();
 }

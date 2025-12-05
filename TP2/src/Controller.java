@@ -6,21 +6,22 @@ public class Controller implements Runnable {
 	private final AvoidObstacle avoidObstacle;
 	private final AccessManager robotManager = new AccessManager();
 	private final AccessManager bufferManager = new AccessManager();
-	private final Buffer buffer = new Buffer();
+	private final Buffer buffer;
 	private final Thread randomMovementsThread;
 	private final Thread avoidObstacleThread;
 
 	public boolean robotOn = false;
 
 	private ILogger logger;
-
 	private Movement movement;
 	private StateEnum bufferState = StateEnum.IDLE;
 
 	private long waitingTime;
 
-	public Controller(ILogger logger) {
+	public Controller(ILogger logger, Record record) {
 		this.logger = logger;
+		
+		this.buffer = new Buffer((GUI) logger, record);
 		
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
 		this.randomMovementsThread = new Thread(randomMovements);
@@ -52,7 +53,7 @@ public class Controller implements Runnable {
 				robotManager.acquire();
 				movement.doMovement();
 				robotManager.release();
-
+				
 				waitingTime = movement.getTime();
 				bufferState = StateEnum.WAIT;
 				break;
