@@ -28,13 +28,6 @@ public class RecorderGUI extends GUI {
 					btnRecord.setText("Stop Recording");
 					record.startRecording();
 				}
-				// TODO Clica uma vez para ativar (cor do botão vermelho). Clicar denovo para
-				// desligar (cor neutra atual).
-				// caso seja apenas para os movimentos da GUI então chamar a função na GUI que
-				// armazena todos os movimentos clicacos num array. Quando o botão é clicado
-				// para parar de dar record, então envia o array para o data.
-
-				// Quando ligado desativa o botão de play e a barra para introduzir ficheiros
 			}
 		});
 		btnRecord.setFont(new Font("Arial", Font.PLAIN, 16));

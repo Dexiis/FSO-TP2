@@ -31,7 +31,7 @@ public abstract class GUI implements ILogger {
 	protected final Thread robotControllerThread;
 
 	protected final Controller robotController;
-	protected final Record record = new Record();
+	protected static final Record record = new Record();
 
 	@Override
 	public void logMessage(String message) {
@@ -39,7 +39,7 @@ public abstract class GUI implements ILogger {
 	}
 
 	public GUI() {
-		this.robotController = new Controller(this, this.record);
+		this.robotController = new Controller(this, record);
 		this.robotControllerThread = new Thread(robotController);
 		robotControllerThread.start();
 		initialize();

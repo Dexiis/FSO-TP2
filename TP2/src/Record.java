@@ -17,17 +17,17 @@ public class Record {
 		
 	}
 	
-	public boolean isRecording() {
+	public synchronized boolean isRecording() {
 		return this.recording;
 	}
 	
-	public synchronized void recordMovement(Movement movement) {
-		System.out.println(isRecording());
+	public void recordMovement(Movement movement) {
 		if(isRecording()) {
 			movementList.add(movement);
 			
 			try {
-				os.write(22);
+				// Write the actual movement
+				os.write(55);
 				os.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -36,10 +36,9 @@ public class Record {
 		
 	}
 	
-	public synchronized void startRecording() {
-		if(!this.recording) {
-			System.out.println("a");
-			this.recording = true;
+	public void startRecording() {
+		if(!isRecording()) {
+			recording = true;
 			
 			try {
 				File file = new File("recorded/Recording.txt");
@@ -50,9 +49,9 @@ public class Record {
 		}
 	}
 	
-	public synchronized void stopRecording() {
-		if(this.recording) {
-			this.recording = false;
+	public void stopRecording() {
+		if(isRecording()) {
+			recording = false;
 		
 			try {
 				os.close();
