@@ -51,7 +51,7 @@ public abstract class GUI implements ILogger {
 	private void initialize() {
 		frmAd = new JFrame();
 		frmAd.setTitle("GUI Trabalho Prático 2");
-		frmAd.setBounds(100, 100, 700, 800);
+		frmAd.setBounds(100, 100, 700, 842);
 		frmAd.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frmAd.getContentPane().setLayout(null);
 		frmAd.setResizable(false);
@@ -61,7 +61,6 @@ public abstract class GUI implements ILogger {
 			public void windowClosing(WindowEvent e) {
 				robotController.turnOffRobot();
 
-				frmAd.dispose();
 				System.exit(0);
 			}
 		});
@@ -83,7 +82,7 @@ public abstract class GUI implements ILogger {
 
 		JLabel lblRobot = new JLabel("Robot");
 		lblRobot.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblRobot.setBounds(540, 10, 59, 29);
+		lblRobot.setBounds(516, 10, 59, 29);
 		frmAd.getContentPane().add(lblRobot);
 
 		JLabel lblLogger = new JLabel("Logger");
@@ -124,7 +123,7 @@ public abstract class GUI implements ILogger {
 		textRobotName.setHorizontalAlignment(SwingConstants.CENTER);
 		textRobotName.setFont(new Font("Arial", Font.PLAIN, 18));
 		textRobotName.setColumns(10);
-		textRobotName.setBounds(600, 11, 100, 30);
+		textRobotName.setBounds(576, 11, 100, 30);
 		frmAd.getContentPane().add(textRobotName);
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -132,11 +131,12 @@ public abstract class GUI implements ILogger {
 		frmAd.getContentPane().add(scrollPane);
 
 		textArea = new JTextArea();
+		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
 
 		chckbxOnOff = new JCheckBox("Turn On");
 		chckbxOnOff.setFont(new Font("Arial", Font.PLAIN, 18));
-		chckbxOnOff.setBounds(600, 50, 95, 28);
+		chckbxOnOff.setBounds(586, 47, 95, 28);
 		frmAd.getContentPane().add(chckbxOnOff);
 		chckbxOnOff.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -232,6 +232,15 @@ public abstract class GUI implements ILogger {
 		});
 		btnSquare.setBounds(10, 250, 100, 35);
 		frmAd.getContentPane().add(btnSquare);
+		
+		JButton btnClearLogger = new JButton("Clear Logger");
+		btnClearLogger.setBounds(10, 770, 666, 25);
+		frmAd.getContentPane().add(btnClearLogger);
+		btnClearLogger.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				textArea.setText("");
+			}
+		});
 		
 		addedFeatures();
 		

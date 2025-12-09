@@ -26,8 +26,7 @@ public class Record {
 			movementList.add(movement);
 			
 			try {
-				// Write the actual movement
-				os.write(55);
+				os.write(movement.serializedMovement());	
 				os.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -41,7 +40,7 @@ public class Record {
 			recording = true;
 			
 			try {
-				File file = new File("recorded/Recording.txt");
+				File file = new File("recorded/Recording.bin");
 				os = new FileOutputStream(file);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();

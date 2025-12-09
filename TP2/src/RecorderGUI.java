@@ -1,12 +1,18 @@
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 public class RecorderGUI extends GUI {
+	
+	File selectedFile;
+	
+	private final PlayMovements player = new PlayMovements(this);
 	
 	public RecorderGUI() {
 	}
@@ -37,27 +43,40 @@ public class RecorderGUI extends GUI {
 		JButton btnPlay = new JButton("Play");
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO Chama a função do robotController que coloca o array de movimentos
-				// guardado no data para o buffer.
+				if(selectedFile == null) 
+					textArea.append("No file chosen.\n");
+				else {
+					player.loadFile(selectedFile);
+					player.playMovements();
+				}
 			}
 		});
 
 		// TODO adicionar barra de introdução de ficheiros
 
 		btnPlay.setFont(new Font("Arial", Font.PLAIN, 16));
-		btnPlay.setBounds(350, 420, 100, 35);
+		btnPlay.setBounds(350, 420, 200, 35);
 		frmAd.getContentPane().add(btnPlay);
 		
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFont(new Font("Arial", Font.PLAIN, 16));
-		fileChooser.setBounds(150, 320, 200, 200);
-		fileChooser.addActionListener(new ActionListener() {
+		JTextArea filePath = new JTextArea();
+		filePath.setBounds(150, 370, 340, 35);
+		frmAd.getContentPane().add(filePath);
+		
+		JButton btnSelectFile = new JButton("...");
+		btnSelectFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fileChooser.showSaveDialog(null);
+				JFileChooser fileChooser = new JFileChooser();
+				int response = fileChooser.showOpenDialog(null);
+				
+				if(response == JFileChooser.APPROVE_OPTION) {
+					selectedFile = new File(fileChooser.getSelectedFile().getAbsolutePath());
+					filePath.setText(selectedFile.toString());
+				}
 			}
 		});
-		frmAd.getContentPane().add(fileChooser);
-		
+		btnSelectFile.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnSelectFile.setBounds(500, 370, 50, 35);
+		frmAd.getContentPane().add(btnSelectFile);
 	}
 	
 }

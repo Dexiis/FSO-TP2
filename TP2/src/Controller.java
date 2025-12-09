@@ -6,9 +6,10 @@ public class Controller implements Runnable {
 	private final AvoidObstacle avoidObstacle;
 	private final AccessManager robotManager = new AccessManager();
 	private final AccessManager bufferManager = new AccessManager();
-	private final Buffer buffer;
+	private final Buffer buffer = new Buffer();
 	private final Thread randomMovementsThread;
 	private final Thread avoidObstacleThread;
+	private final Record record;
 
 	public boolean robotOn = false;
 
@@ -20,8 +21,7 @@ public class Controller implements Runnable {
 
 	public Controller(ILogger logger, Record record) {
 		this.logger = logger;
-		
-		this.buffer = new Buffer((GUI) logger, record);
+		this.record = record;
 		
 		this.randomMovements = new RandomMovements(robot, logger, this, bufferManager);
 		this.randomMovementsThread = new Thread(randomMovements);
@@ -106,29 +106,37 @@ public class Controller implements Runnable {
 	}
 
 	public synchronized void bufferMoveForward() {
+		Movement m = new ForwardMovement(data.getDistance(), robot, logger);
 		bufferManager.acquire();
-		buffer.put(new ForwardMovement(data.getDistance(), robot, logger));
+		buffer.put(m);
+		recordMovement(m);
 		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferMoveBackwards() {
+		Movement m = new BackwardsMovement(data.getDistance(), robot, logger);
 		bufferManager.acquire();
-		buffer.put(new BackwardsMovement(data.getDistance(), robot, logger));
+		buffer.put(m);
+		recordMovement(m);
 		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferMoveRightCurve() {
+		Movement m = new RightMovement(data.getRadius(), data.getAngle(), robot, logger);
 		bufferManager.acquire();
-		buffer.put(new RightMovement(data.getRadius(), data.getAngle(), robot, logger));
+		buffer.put(m);
+		recordMovement(m);
 		bufferManager.release();
 		notify();
 	}
 
 	public synchronized void bufferMoveLeftCurve() {
+		Movement m = new LeftMovement(data.getRadius(), data.getAngle(), robot, logger);
 		bufferManager.acquire();
-		buffer.put(new LeftMovement(data.getRadius(), data.getAngle(), robot, logger));
+		buffer.put(m);
+		recordMovement(m);
 		bufferManager.release();
 		notify();
 	}
@@ -149,10 +157,20 @@ public class Controller implements Runnable {
 		buffer.higherPriorityPut(movement);
 		notify();
 	}
+	
+	public synchronized void bufferManagerAcquire() {
+		bufferManager.acquire();
+	}
+	
+	public synchronized void bufferManagerRelease() {
+		bufferManager.release();
+	}
 
 	public void stopMovement() {
+		Movement m = new StopMovement(robot, logger);
 		robotManager.acquire();
-		new StopMovement(robot, logger).doMovement();;
+		m.doMovement();
+		recordMovement(m);
 		robotManager.release();
 		this.waitingTime = 0;
 	}
@@ -177,6 +195,10 @@ public class Controller implements Runnable {
 	public synchronized boolean obstacleFound() {
 		return robot.SensorToque(robot.S_1) == 1;
 	}
+	
+	public RobotLegoEV3 getRobot() {
+		return this.robot;
+	}
 
 	public void startRandomMovements() {
 		randomMovements.setActionNumber(data.getActionNumber());
@@ -190,4 +212,11 @@ public class Controller implements Runnable {
 	public void clearBuffer() {
 		buffer.clearBuffer();
 	}
+	
+	private void recordMovement(Movement movementToRecord) {
+		if (record.isRecording() && (GUI) this.logger instanceof RandomMovementsGUI) {
+			record.recordMovement(movementToRecord);
+		}
+	}
+	
 }

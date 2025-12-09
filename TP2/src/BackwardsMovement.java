@@ -7,6 +7,7 @@ public class BackwardsMovement extends Movement {
 		super(logger);
 		this.distance = distance;
 		this.robot = robot;
+		this.id = 'b';
 	}
 
 	public void doMovement() {
@@ -17,4 +18,16 @@ public class BackwardsMovement extends Movement {
 	public int getTime() {
 		return (int) ((distance / 0.02) + 100);
 	}
+
+	@Override
+	public byte[] serializedMovement() {
+		byte[] movement = new byte[FIXED_LENGTH];
+		movement[0] = this.id;
+		movement[1] = (byte) (distance >> 24);
+		movement[2] = (byte) (distance >> 16);
+		movement[3] = (byte) (distance >> 8);
+		movement[4] = (byte) distance;
+		return movement;
+	}
+	
 }
