@@ -9,30 +9,20 @@ public class Record {
 	
 	private volatile boolean recording = false;
 	
-	private ArrayList<Movement> movementList = new ArrayList<>();
-	
 	private OutputStream os;
-	
-	public Record() {
-		
-	}
 	
 	public synchronized boolean isRecording() {
 		return this.recording;
 	}
 	
 	public void recordMovement(Movement movement) {
-		if(isRecording()) {
-			movementList.add(movement);
-			
+		if(isRecording())
 			try {
 				os.write(movement.serializedMovement());	
 				os.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		
 	}
 	
 	public void startRecording() {
@@ -51,14 +41,12 @@ public class Record {
 	public void stopRecording() {
 		if(isRecording()) {
 			recording = false;
-		
+			
 			try {
 				os.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			movementList.clear();
 		}
 	}
 	

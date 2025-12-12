@@ -13,9 +13,6 @@ public class RecorderGUI extends GUI {
 	File selectedFile;
 	
 	private final PlayMovements player = new PlayMovements(this);
-	
-	public RecorderGUI() {
-	}
 
 	@Override
 	protected void addedFeatures() {
@@ -51,8 +48,6 @@ public class RecorderGUI extends GUI {
 				}
 			}
 		});
-
-		// TODO adicionar barra de introdução de ficheiros
 
 		btnPlay.setFont(new Font("Arial", Font.PLAIN, 16));
 		btnPlay.setBounds(350, 420, 200, 35);

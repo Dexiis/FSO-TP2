@@ -150,6 +150,7 @@ public class Controller implements Runnable {
 
 	public synchronized void putBuffer(Movement movement) {
 		buffer.put(movement);
+		recordMovement(movement);
 		notify();
 	}
 
@@ -214,9 +215,8 @@ public class Controller implements Runnable {
 	}
 	
 	private void recordMovement(Movement movementToRecord) {
-		if (record.isRecording() && (GUI) this.logger instanceof RandomMovementsGUI) {
+		if (record.isRecording() && (GUI) this.logger instanceof RandomMovementsGUI) 
 			record.recordMovement(movementToRecord);
-		}
 	}
 	
 }
