@@ -168,7 +168,8 @@ public abstract class GUI implements ILogger {
 				robotController.clearBuffer();
 				robotController.stopMovement();
 				robotController.stopRandomMovements();
-				rdbtnRandomMovements.setSelected(false);
+				if (rdbtnRandomMovements != null)
+					rdbtnRandomMovements.setSelected(false);
 			}
 		});
 		btnStop.setFont(new Font("Arial", Font.BOLD, 18));
